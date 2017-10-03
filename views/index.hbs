@@ -1,0 +1,60 @@
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://wzrd.in/standalone/uuid%2Fv4@latest"></script>
+
+<h1>Serialized Todo App</h1>
+
+<form id="create-list-form">
+  <input id="list-name" type="text" />
+  <button type="submit" id="create-todo">New todo list</button> <span id="status"></span>
+</form>
+
+<ul id="todo-lists">
+  {{#each lists}} {{#if completed}}
+  <li>
+    <del><a href="/lists/{{listId}}">{{title}}</a></del>
+  </li>
+  {{else}}
+  <li><a href="/lists/{{listId}}">{{title}}</a></li>
+  {{/if}} {{else}}
+  <p>No lists</p>
+  <p><i>If you expect to see something here, check that you created the Projection definitions in the Readme.</i></p>
+  {{/each}}
+</ul>
+
+<div>
+  <h3>Stats</h3>
+  <div>Lists: <span id="listCount"></span></div>
+  <div>Todos: <span id="todoCount"></span></div>
+  <div>Completed todos: <span id="completedTodoCount"></span></div>
+  <div id="stats-status"></div>
+</div>
+
+<script>
+  $('#stats-status').text('Loading...')
+
+  $.getJSON('/stats', function (data) {
+    $('#todoCount').text(data.todoCount)
+    $('#listCount').text(data.listCount)
+    $('#completedTodoCount').text(data.completedTodoCount)
+    $('#stats-status').fadeOut(500)
+  });
+
+  $('#create-list-form').submit(function (e) {
+    e.preventDefault();
+    var listId = uuidv4();
+    var listName = $('#list-name').val();
+    $('#status').html('Saving...');
+    $('#list-name').val('');
+    $("#todo-lists").prepend('<li><a href=\"/lists/' + listId + '">' + listName + '</a></li>');
+    $.ajax('/lists/commands/create-list', {
+      type: 'POST',
+      contentType: "application/json; charset=utf-8",
+      data: JSON.stringify({ listId: listId, name: listName })
+    }).done(function (response) {
+      $('#status').fadeOut(1500)
+    }).fail(function () {
+      console.log('error')
+    });
+  });
+
+</script>
