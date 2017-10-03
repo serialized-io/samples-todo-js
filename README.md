@@ -4,7 +4,7 @@ An example application showcasing the basic usage of the Event Sourcing API and 
 
 If you want to see the application in action, go to [https://serialized-todo-demo.herokuapp.com/](https://serialized-todo-demo.herokuapp.com/)
 
-- Register for a free account at [https://serialized.io](https://serialized.io) if you haven't already
+- Register for a free account at [https://serialized.io](https://serialized.io) to get your access keys to the API (if you haven't already).
 
 - Clone this repository and make sure you can run the application locally:
 
