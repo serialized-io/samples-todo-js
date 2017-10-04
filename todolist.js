@@ -17,6 +17,8 @@ class TodoList {
   }
 
   static createNew(listId, name) {
+    if (!listId || listId.length != 36) throw "Invalid listId"
+    if (!name || name.length < 5) throw "Name must have length >= 5"
     var data = { listId: listId, name: name }
     return [newEvent('TodoListCreatedEvent', data)]
   }

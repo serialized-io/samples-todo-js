@@ -81,8 +81,35 @@ describe('TodoList', function () {
 
 
   it('should emit one event when list is new', function () {
-    var events = TodoList.createNew()
+    var events = TodoList.createNew(uuidv4(), "Xmas gifts")
     assert.equal(1, events.length);
   });
-
+  
+  it('should fail if invalid id', function () {
+    assert.throws(
+      () => {
+        TodoList.createNew("", "Xmas gifts")
+      },
+      /Invalid listId/
+    );
+  });
+  
+  it('should fail if empty list name', function () {
+    assert.throws(
+      () => {
+        TodoList.createNew(uuidv4(), "")
+      },
+      /Name must have length/
+    );
+  });
+  
+  it('should fail if undefined name', function () {
+    assert.throws(
+      () => {
+        TodoList.createNew(uuidv4())
+      },
+      /Name must have length/
+    );
+  });
+  
 });
