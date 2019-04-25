@@ -11,7 +11,6 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/stats', function (req, res, next) {
-  var listId = req.params.listId;
   return client.findListStats()
     .then(listStats => res.send(listStats))
 });

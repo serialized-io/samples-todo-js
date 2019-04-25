@@ -1,6 +1,6 @@
-## Serialized IO Node.js Todo example
+## Serialized Node.js Todo example
 
-An example application showcasing the basic usage of the Event Sourcing API and the Projection API of Serialized IO.
+An example application showcasing the basic usage of the Event Sourcing API and the Projection API of Serialized.
 
 If you want to see the application in action, go to [https://serialized-todo-demo.herokuapp.com/](https://serialized-todo-demo.herokuapp.com/)
 
@@ -44,19 +44,32 @@ curl -i -X POST https://api.serialized.io/projections/definitions \
     {
       "eventType": "TodoAddedEvent",
       "functions": [
-        { "function": "prepend", "targetSelector": "$.projection.todos" }
+        { 
+          "function": "prepend", 
+          "targetSelector": 
+          "$.projection.todos" 
+        }
       ]
     },
     {
       "eventType": "TodoCompletedEvent",
       "functions": [
-        { "function": "merge", "targetSelector": "$.projection.todos[?]", "targetFilter": "[?(@.todoId == $.event.todoId)]", "rawData": {"status" : "COMPLETED"} }
+        { 
+          "function": "merge", 
+          "targetSelector": "$.projection.todos[?]", 
+          "targetFilter": "[?(@.todoId == $.event.todoId)]", 
+          "rawData": {"status" : "COMPLETED"} 
+        }
       ]
     },
     {
       "eventType": "TodoListCompletedEvent",
       "functions": [
-        { "function": "set", "targetSelector": "$.projection.status", "rawData": "COMPLETED" }
+        { 
+          "function": "set", 
+          "targetSelector": "$.projection.status", 
+          "rawData": "COMPLETED" 
+        }
       ]
     }
   ]
@@ -81,19 +94,31 @@ curl -i -X POST https://api.serialized.io/projections/definitions \
     {
       "eventType": "TodoListCreatedEvent",
       "functions": [
-        { "function": "inc", "targetSelector": "$.projection.listCount" }
+        { 
+          "function": "inc", 
+          "targetSelector": 
+          "$.projection.listCount" 
+        }
       ]
     },
     {
       "eventType": "TodoAddedEvent",
       "functions": [
-        { "function": "inc", "targetSelector": "$.projection.todoCount" }
+        { 
+          "function": "inc", 
+          "targetSelector": 
+          "$.projection.todoCount" 
+        }
       ]
     },
     {
       "eventType": "TodoCompletedEvent",
       "functions": [
-        { "function": "inc", "targetSelector": "$.projection.completedTodoCount" }
+        { 
+          "function": "inc", 
+          "targetSelector": 
+          "$.projection.completedTodoCount" 
+        }
       ]
     }
   ]
