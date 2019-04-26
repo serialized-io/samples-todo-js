@@ -38,7 +38,7 @@ curl -i -X POST https://api.serialized.io/projections/definitions \
       "eventType": "TodoListCreatedEvent",
       "functions": [
         { "function": "set", "eventSelector": "$.event.name", "targetSelector": "$.projection.name" },
-        { "function": "set", "eventSelector": "$.aggregateId", "targetSelector": "$.projection.listId" }
+        { "function": "set", "eventSelector": "$.metadata.aggregateId", "targetSelector": "$.projection.listId" }
       ]
     },
     {
