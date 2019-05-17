@@ -41,7 +41,7 @@
 
   $('#create-list-form').submit(function (e) {
     e.preventDefault();
-    var listId = uuidv4();
+      var listId = uuid.v4();
     var listName = $('#list-name').val();
     $('#status').html('Saving...');
     $('#list-name').val('');
