@@ -7,7 +7,7 @@
     "test": "node ./node_modules/mocha/bin/mocha"
   },
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "body-parser": "~1.19.0",
     "cookie-parser": "~1.4.4",
     "debug": "~4.1.1",
