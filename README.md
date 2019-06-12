@@ -55,10 +55,10 @@ curl -i -X POST https://api.serialized.io/projections/definitions \
       "eventType": "TodoCompletedEvent",
       "functions": [
         { 
-          "function": "merge", 
-          "targetSelector": "$.projection.todos[?]", 
+          "function": "set", 
+          "targetSelector": "$.projection.todos[?].status", 
           "targetFilter": "[?(@.todoId == $.event.todoId)]", 
-          "rawData": {"status" : "COMPLETED"} 
+          "rawData": "COMPLETED"
         }
       ]
     },
