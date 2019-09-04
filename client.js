@@ -1,5 +1,5 @@
-var axios = require('axios')
-var TodoList = require('./todolist')
+var axios = require('axios');
+var TodoList = require('./todolist');
 
 class TodoListClient {
 
@@ -22,37 +22,48 @@ class TodoListClient {
   loadTodoList(listId) {
     return this.axios.get(`/aggregates/list/${listId}`)
       .then(response => TodoList.loadStateFrom(response.data.events))
-      .catch(error => { throw `Failed to load todo list with id ${listId}` }
+      .catch(error => {
+          throw `Failed to load todo list with id ${listId}`
+        }
       )
   }
 
   findListProjections() {
     return this.axios.get('/projections/single/lists/')
-      .then(response => { return response.data.projections.map(projection => projection.data) })
-      .catch(error => { throw `Failed to load list projections` })
+      .then(response => {
+        return response.data.projections.map(projection => projection.data)
+      })
+      .catch(error => {
+        throw `Failed to load list projections`
+      })
   }
 
   findListStats() {
     return this.axios.get('/projections/aggregated/list-stats')
       .then(response => response.data.data)
-      .catch(error => { throw `Failed to load list stats for list ${listId}: ${error.status}` })
+      .catch(error => {
+        throw `Failed to load list stats for list ${listId}: ${error.status}`
+      })
   }
 
   findListProjection(listId) {
     return this.axios.get(`/projections/single/lists/${listId}`)
       .then(response => response.data.data)
-      .catch(error => { throw `Failed to load list projection for list ${listId}` })
+      .catch(error => {
+        throw `Failed to load list projection for list ${listId}`
+      })
   }
 
   saveListEvents(aggregateId, events) {
-    var request = { aggregateId: aggregateId, events: events }
+    var request = {aggregateId: aggregateId, events: events};
     if (events.length > 0) {
       return this.axios.post('/aggregates/list/events', request)
         .then(response => response.status)
-        .catch(error => { throw `Failed to save events for list ${listId}` })
+        .catch(error => {
+          throw `Failed to save events for list ${listId}`
+        })
     }
   }
 }
 
-
-module.exports =  TodoListClient 
+module.exports = TodoListClient;

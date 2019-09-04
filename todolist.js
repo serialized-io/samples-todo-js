@@ -11,23 +11,23 @@ function newEvent(eventType, data) {
 class TodoList {
 
   constructor() {
-    this.todos = []
-    this.todosLeft = []
+    this.todos = [];
+    this.todosLeft = [];
     this.completed = false
   }
 
   static createNew(listId, name) {
-    if (!listId || listId.length != 36) throw "Invalid listId"
-    if (!name || name.length < 5) throw "Name must have length >= 5"
-    var data = { listId: listId, name: name }
+    if (!listId || listId.length !== 36) throw "Invalid listId";
+    if (!name || name.length < 5) throw "Name must have length >= 5";
+    var data = {listId: listId, name: name};
     return [newEvent('TodoListCreatedEvent', data)]
   }
 
   completeTodo(todoId) {
     if (this.todosLeft.indexOf(todoId) > -1) {
-      var todo = { todoId: todoId }
-      var events = [newEvent('TodoCompletedEvent', todo)]
-      if (this.todosLeft.length == 1) {
+      var todo = {todoId: todoId};
+      var events = [newEvent('TodoCompletedEvent', todo)];
+      if (this.todosLeft.length === 1) {
         events.push(newEvent('TodoListCompletedEvent'))
       }
       return events
@@ -38,9 +38,9 @@ class TodoList {
   }
 
   addTodo(todoId, text) {
-    if (this.completed) throw "List cannot be changed since it has been completed"
-    if (text === undefined || text.length < 5) throw "Text must have length > 4"
-    var todo = { todoId: todoId, text: text }
+    if (this.completed) throw "List cannot be changed since it has been completed";
+    if (text === undefined || text.length < 5) throw "Text must have length > 4";
+    var todo = {todoId: todoId, text: text};
     return [newEvent('TodoAddedEvent', todo)]
   }
 
@@ -49,7 +49,7 @@ class TodoList {
   }
 
   'TodoAddedEvent'(event) {
-    this.todos.unshift({ text: event.data.text, todoId: event.data.todoId })
+    this.todos.unshift({text: event.data.text, todoId: event.data.todoId});
     this.todosLeft.unshift(event.data.todoId)
   }
 
@@ -60,7 +60,7 @@ class TodoList {
   'TodoCompletedEvent'(event) {
     // Remove from list
     this.todosLeft = this.todosLeft.filter(function (todoId) {
-      return todoId != event.data.todoId;
+      return todoId !== event.data.todoId;
     })
   }
 
@@ -69,7 +69,7 @@ class TodoList {
   }
 
   static loadStateFrom(events) {
-    var instance = new this.prototype.constructor()
+    var instance = new this.prototype.constructor();
     for (var i = 0, len = events.length; i < len; i++) {
       instance.handleEvent(events[i]);
     }
@@ -77,4 +77,4 @@ class TodoList {
   }
 }
 
-module.exports = TodoList
+module.exports = TodoList;

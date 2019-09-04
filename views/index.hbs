@@ -4,20 +4,21 @@
 <h1>Serialized Todo App</h1>
 
 <form id="create-list-form">
-  <input id="list-name" type="text" />
-  <button type="submit" id="create-todo">New todo list</button> <span id="status"></span>
+  <input id="list-name" type="text"/>
+  <button type="submit" id="create-todo">New todo list</button>
+  <span id="status"></span>
 </form>
 
 <ul id="todo-lists">
   {{#each lists}} {{#if completed}}
-  <li>
-    <del><a href="/lists/{{listId}}">{{title}}</a></del>
-  </li>
+    <li>
+      <del><a href="/lists/{{listId}}">{{title}}</a></del>
+    </li>
   {{else}}
-  <li><a href="/lists/{{listId}}">{{title}}</a></li>
+    <li><a href="/lists/{{listId}}">{{title}}</a></li>
   {{/if}} {{else}}
-  <p>No lists</p>
-  <p><i>If you expect to see something here, check that you created the Projection definitions in the Readme.</i></p>
+    <p>No lists</p>
+    <p><i>If you expect to see something here, check that you created the Projection definitions in the Readme.</i></p>
   {{/each}}
 </ul>
 
@@ -30,18 +31,18 @@
 </div>
 
 <script>
-  $('#stats-status').text('Loading...')
+  $('#stats-status').text('Loading...');
 
   $.getJSON('/stats', function (data) {
-    $('#todoCount').text(data.todoCount)
-    $('#listCount').text(data.listCount)
-    $('#completedTodoCount').text(data.completedTodoCount)
-    $('#stats-status').fadeOut(500)
+    $('#todoCount').text(data.todoCount);
+    $('#listCount').text(data.listCount);
+    $('#completedTodoCount').text(data.completedTodoCount);
+    $('#stats-status').fadeOut(500);
   });
 
   $('#create-list-form').submit(function (e) {
     e.preventDefault();
-      var listId = uuid.v4();
+    var listId = uuid.v4();
     var listName = $('#list-name').val();
     $('#status').html('Saving...');
     $('#list-name').val('');
@@ -49,7 +50,7 @@
     $.ajax('/lists/commands/create-list', {
       type: 'POST',
       contentType: "application/json; charset=utf-8",
-      data: JSON.stringify({ listId: listId, name: listName })
+      data: JSON.stringify({listId: listId, name: listName})
     }).done(function (response) {
       $('#status').fadeOut(1500)
     }).fail(function () {

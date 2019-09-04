@@ -14,7 +14,7 @@ app.set('view engine', 'hbs');
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -38,19 +38,19 @@ app.use(function (req, res, next) {
 
 function clientErrorHandler(err, req, res, next) {
   if (req.xhr) {
-    console.error(err)
-    res.status(500).send({ error: 'Something failed!' })
+    console.error(err);
+    res.status(500).send({error: 'Something failed!'})
   } else {
     next(err)
   }
 }
 
 function errorHandler(err, req, res, next) {
-  res.status(err.status)
-  res.render('error', { error: err })
+  res.status(err.status);
+  res.render('error', {error: err})
 }
 
-app.use(clientErrorHandler)
-app.use(errorHandler)
+app.use(clientErrorHandler);
+app.use(errorHandler);
 
 module.exports = app;

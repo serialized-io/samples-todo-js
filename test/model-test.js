@@ -1,7 +1,7 @@
 var uuidv4 = require('uuid/v4');
 var assert = require('assert');
-var TodoList = require('../todolist')
-var TodoListClient = require('../client')
+var TodoList = require('../todolist');
+var TodoListClient = require('../client');
 
 var MockAdapter = require('axios-mock-adapter');
 var axios = require('axios');
@@ -13,7 +13,7 @@ var todoListCreatedEvent = {
     listId: uuidv4(),
     name: "My personal todo list"
   }
-}
+};
 
 var buyMilkAddedEvent = {
   eventType: "TodoAddedEvent",
@@ -21,29 +21,28 @@ var buyMilkAddedEvent = {
     todoId: uuidv4(),
     text: 'Buy milk'
   }
-}
+};
 
 var buyMilkCompletedEvent = {
   eventType: "TodoCompletedEvent",
   data: {
     todoId: buyMilkAddedEvent.data.todoId,
   }
-}
+};
 
 var todoListCompletedEvent = {
   eventType: "TodoListCompletedEvent",
   data: {
     listId: todoListCreatedEvent.data.listId,
   }
-}
+};
 
-var todoListAggregate =
-  {
-    aggregateId: todoListCreatedEvent.data.listId,
-    aggregateType: "todolist",
-    aggregateVersion: 1,
-    events: [todoListCreatedEvent]
-  }
+var todoListAggregate = {
+  aggregateId: todoListCreatedEvent.data.listId,
+  aggregateType: "todolist",
+  aggregateVersion: 1,
+  events: [todoListCreatedEvent]
+};
 
 describe('TodoList', function () {
 
@@ -53,9 +52,9 @@ describe('TodoList', function () {
       buyMilkAddedEvent,
       buyMilkCompletedEvent,
       todoListCompletedEvent
-    ]
+    ];
 
-    var todoList = TodoList.loadStateFrom(events)
+    var todoList = TodoList.loadStateFrom(events);
     assert.throws(
       () => {
         todoList.addTodo(uuidv4(), 'Too late to add more todos..')
@@ -66,8 +65,8 @@ describe('TodoList', function () {
   });
 
   it('test client mock', () => {
-    var client = new TodoListClient(axios)
-    var listId = todoListCreatedEvent.data.listId
+    var client = new TodoListClient(axios);
+    var listId = todoListCreatedEvent.data.listId;
 
     mock.onGet(`/aggregates/list/${listId}`).reply(200, todoListAggregate);
     mock.onPost(`/aggregates/list/events`).reply(200);
@@ -76,15 +75,17 @@ describe('TodoList', function () {
       .then(todoList => todoList.addTodo(uuidv4(), 'Buy bread'))
       .then(events => client.saveListEvents(listId, events))
       .then(response => assert.equal(response, 200))
-      .catch(e => { throw "Failed to save events" })
+      .catch(e => {
+        throw "Failed to save events"
+      })
   });
 
 
   it('should emit one event when list is new', function () {
-    var events = TodoList.createNew(uuidv4(), "Xmas gifts")
+    var events = TodoList.createNew(uuidv4(), "Xmas gifts");
     assert.equal(1, events.length);
   });
-  
+
   it('should fail if invalid id', function () {
     assert.throws(
       () => {
@@ -93,7 +94,7 @@ describe('TodoList', function () {
       /Invalid listId/
     );
   });
-  
+
   it('should fail if empty list name', function () {
     assert.throws(
       () => {
@@ -102,7 +103,7 @@ describe('TodoList', function () {
       /Name must have length/
     );
   });
-  
+
   it('should fail if undefined name', function () {
     assert.throws(
       () => {
@@ -111,5 +112,5 @@ describe('TodoList', function () {
       /Name must have length/
     );
   });
-  
+
 });

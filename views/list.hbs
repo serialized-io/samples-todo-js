@@ -6,28 +6,29 @@
 
   {{#if completed}}
     {{#each todos}}
-    <div>
-      <del>{{text}}</del>
-    </div>
+      <div>
+        <del>{{text}}</del>
+      </div>
     {{/each}}
   {{else}}
     <form id="create-todo-form">
-      <input id="todo-text" type="text" />
-      <input type="hidden" id="list-id" value="{{listId}}" />
+      <input id="todo-text" type="text"/>
+      <input type="hidden" id="list-id" value="{{listId}}"/>
       <button type="submit" id="create-todo">Create new todo</button>
     </form>
 
     <div id="todos">
       {{#each todos}}
-      <div>
-        <input class="todo" type="checkbox" id="{{todoId}}" {{checked}} value="{{todoId}}" /> {{#if checked}}
-        <del><label id="label-{{todoId}}" for="{{todoId}}">{{text}}</label></del>
+        <div>
+          <input class="todo" type="checkbox" id="{{todoId}}" {{checked}} value="{{todoId}}"/> {{#if checked}}
+          <del><label id="label-{{todoId}}" for="{{todoId}}">{{text}}</label></del>
         {{else}}
-        <label id="label-{{todoId}}" for="{{todoId}}">{{text}}</label> {{/if}}
-      </div>
+          <label id="label-{{todoId}}" for="{{todoId}}">{{text}}</label> {{/if}}
+        </div>
       {{else}}
-      <p>No todos.</p>
-      <p><i>If you expect to see something here, check that you created the Projection definitions in the Readme.</i></p>
+        <p>No todos.</p>
+        <p><i>If you expect to see something here, check that you created the Projection definitions in the Readme.</i>
+        </p>
       {{/each}}
     </div>
   {{/if}}
@@ -35,36 +36,36 @@
 
 <script>
   $('.todo').change(function (e) {
-    var todoId = e.target.id
-    var listId = $('#list-id').val()
-    e.target.disabled = "disabled"
+    var todoId = e.target.id;
+    var listId = $('#list-id').val();
+    e.target.disabled = "disabled";
     $.ajax('/lists/commands/complete-todo', {
       type: 'POST',
       contentType: "application/json; charset=utf-8",
-      data: JSON.stringify({ todoId: todoId, listId: listId })
+      data: JSON.stringify({todoId: todoId, listId: listId})
     }).done(function () {
-      e.target.disabled = ""
+      e.target.disabled = "";
       $('#label-' + todoId).wrap('<del></del>')
     }).fail(function () {
       console.log('error')
     });
-  })
+  });
 
   $('#create-todo-form').submit(function (e) {
-    e.preventDefault()
-    var todoText = $('#todo-text').val()
-    var listId = $('#list-id').val()
-      var todoId = uuid()
+    e.preventDefault();
+    var todoText = $('#todo-text').val();
+    var listId = $('#list-id').val();
+    var todoId = uuid();
     $('#todo-text').val('');
     $("#todos").prepend('<p id="' + todoId + '">Adding: ' + todoText + '</p>');
     $.ajax('/lists/commands/create-todo', {
       type: 'POST',
       contentType: "application/json; charset=utf-8",
-      data: JSON.stringify({ text: todoText, todoId: todoId, listId: listId })
+      data: JSON.stringify({text: todoText, todoId: todoId, listId: listId})
     }).done(function () {
       var todoInput = '<input class="todo" type="checkbox" id="' + todoId + '" value="' + todoId + '" />';
       var todoLabel = '<label for="' + todoId + '">' + todoText + '</label>';
-      var todoDiv = '<div>' + todoInput + todoLabel + '</div>'
+      var todoDiv = '<div>' + todoInput + todoLabel + '</div>';
       $('#' + todoId).replaceWith(todoDiv);
     }).fail(function () {
       console.log('error')
