@@ -1,29 +1,37 @@
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/node-uuid/1.4.8/uuid.js"></script>
 
-<h1>Serialized Todo App</h1>
-
-<form id="create-list-form">
-  <input id="list-name" type="text"/>
-  <button type="submit" id="create-todo">New todo list</button>
-  <span id="status"></span>
-</form>
-
-<ul id="todo-lists">
-  {{#each lists}} {{#if completed}}
-    <li>
-      <del><a href="/lists/{{listId}}">{{title}}</a></del>
-    </li>
-  {{else}}
-    <li><a href="/lists/{{listId}}">{{title}}</a></li>
-  {{/if}} {{else}}
-    <p>No lists</p>
-    <p><i>If you expect to see something here, check that you created the Projection definitions in the Readme.</i></p>
-  {{/each}}
-</ul>
+<hr/>
 
 <div>
-  <h3>Stats</h3>
+  <h3>Create a new ToDo list</h3>
+  <form id="create-list-form">
+    <label for="list-name">Enter name of list to create: </label>
+    <input id="list-name" type="text"/>
+    <button type="submit" id="create-todo">Submit</button>
+    <span id="status"></span>
+  </form>
+</div>
+
+<div>
+  <h3>Existing lists</h3>
+  <ul id="todo-lists">
+    {{#each lists}} {{#if completed}}
+      <li>
+        <del><a href="/lists/{{listId}}">{{title}}</a></del>
+      </li>
+    {{else}}
+      <li><a href="/lists/{{listId}}">{{title}}</a></li>
+    {{/if}} {{else}}
+      <p>No lists</p>
+      <p><i>If you expect to see something here, check that you created the Projection definitions in the Readme.</i>
+      </p>
+    {{/each}}
+  </ul>
+</div>
+
+<div>
+  <h3>Projected stats</h3>
   <div>Lists: <span id="listCount"></span></div>
   <div>Todos: <span id="todoCount"></span></div>
   <div>Completed todos: <span id="completedTodoCount"></span></div>
@@ -43,19 +51,22 @@
   $('#create-list-form').submit(function (e) {
     e.preventDefault();
     var listId = uuid.v4();
-    var listName = $('#list-name').val();
-    $('#status').html('Saving...');
+    var listName = $("#list-name").val();
     $('#list-name').val('');
-    $("#todo-lists").prepend('<li><a href=\"/lists/' + listId + '">' + listName + '</a></li>');
+    $("#status").show();
+    $('#status').html('Saving...');
+
     $.ajax('/lists/commands/create-list', {
       type: 'POST',
       contentType: "application/json; charset=utf-8",
       data: JSON.stringify({listId: listId, name: listName})
-    }).done(function (response) {
-      $('#status').fadeOut(1500)
-    }).fail(function () {
-      console.log('error')
-    });
+    }).done(function () {
+      $("#todo-lists").prepend('<li><a href=\"/lists/' + listId + '">' + listName + '</a></li>');
+    }).fail(function (response) {
+      console.log(response);
+    }).always(function () {
+      $('#status').fadeOut(1500);
+    })
   });
 
 </script>
