@@ -23,22 +23,23 @@
           <label id="label-{{todoId}}" for="{{todoId}}">{{text}}</label> {{/if}}
         </div>
       {{else}}
-        <p>No todos.</p>
-        <p><i>If you expect to see something here, check that you created the Projection definitions in the Readme.</i>
-        </p>
+        <p>No todos, yet.</p>
       {{/each}}
     </div>
 
     <h3>Add a ToDo to the list</h3>
 
     <form id="create-todo-form">
-      <label for="todo-text">Enter a new ToDo: </label>
-      <input id="todo-text" type="text"/>
-      <input type="hidden" id="list-id" value="{{listId}}"/>
-      <button type="submit" id="create-todo">Sumbit</button>
-      <span id="status"></span>
+      <div><label for="todo-text">Enter a new ToDo: </label>
+        <input id="todo-text" type="text"/>
+        <input type="hidden" id="list-id" value="{{listId}}"/>
+        <button type="submit" id="create-todo">Sumbit</button>
+        <span id="status"></span>
+      </div>
+      <div>
+        <span style="color: red" id="error-message"></span>
+      </div>
     </form>
-
   {{/if}}
 
   <div>
@@ -68,11 +69,11 @@
 
   $('#create-todo-form').submit(function (e) {
     e.preventDefault();
-    var todoText = $("#todo-text").val();
     var listId = $('#list-id').val();
     var todoId = uuid();
-    $("#todo-text").val('');
-    $("#todos").prepend('<p id="' + todoId + '">Adding: ' + todoText + '</p>');
+    var todoText = $("#todo-text").val();
+    $('#error-message').text('');
+    $('#todo-text').val('');
     $.ajax('/lists/commands/create-todo', {
       type: 'POST',
       contentType: "application/json; charset=utf-8",
@@ -81,9 +82,10 @@
       var todoInput = '<input class="todo" type="checkbox" id="' + todoId + '" value="' + todoId + '" />';
       var todoLabel = '<label id="label-' + todoId + '" for="' + todoId + '">&nbsp;' + todoText + '</label>';
       var todoDiv = '<div>' + todoInput + todoLabel + '</div>';
-      $('#' + todoId).replaceWith(todoDiv);
-    }).fail(function () {
-      console.log('error')
+      $("#todos").append(todoDiv);
+    }).fail(function (response) {
+      console.log(response.responseJSON.error);
+      $('#error-message').text('Error:' + response.responseJSON.error);
     });
 
   });

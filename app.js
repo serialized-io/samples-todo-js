@@ -39,7 +39,7 @@ app.use(function (req, res, next) {
 function clientErrorHandler(err, req, res, next) {
   if (req.xhr) {
     console.error(err);
-    res.status(500).send({error: 'Something failed!'})
+    res.status(500).json({error: err})
   } else {
     next(err)
   }

@@ -6,10 +6,15 @@
 <div>
   <h3>Create a new ToDo list</h3>
   <form id="create-list-form">
-    <label for="list-name">Enter name of list to create: </label>
-    <input id="list-name" type="text"/>
-    <button type="submit" id="create-todo">Submit</button>
-    <span id="status"></span>
+    <div>
+      <label for="list-name">Enter name of list to create: </label>
+      <input id="list-name" type="text"/>
+      <button type="submit" id="create-todo">Submit</button>
+      <span id="status"></span>
+    </div>
+    <div>
+      <span style="color: red" id="error-message"></span>
+    </div>
   </form>
 </div>
 
@@ -53,6 +58,7 @@
     var listId = uuid.v4();
     var listName = $("#list-name").val();
     $('#list-name').val('');
+    $('#error-message').text('');
     $("#status").show();
     $('#status').html('Saving...');
 
@@ -61,9 +67,10 @@
       contentType: "application/json; charset=utf-8",
       data: JSON.stringify({listId: listId, name: listName})
     }).done(function () {
-      $("#todo-lists").prepend('<li><a href=\"/lists/' + listId + '">' + listName + '</a></li>');
+      $("#todo-lists").append('<li><a href=\"/lists/' + listId + '">' + listName + '</a></li>');
     }).fail(function (response) {
-      console.log(response);
+      console.log(response.responseJSON.error);
+      $('#error-message').text('Error: ' + response.responseJSON.error);
     }).always(function () {
       $('#status').fadeOut(1500);
     })

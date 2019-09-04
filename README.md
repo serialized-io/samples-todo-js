@@ -45,7 +45,7 @@ curl -i -X POST https://api.serialized.io/projections/definitions \
       "eventType": "TodoAddedEvent",
       "functions": [
         { 
-          "function": "prepend", 
+          "function": "push", 
           "targetSelector": 
           "$.projection.todos" 
         }

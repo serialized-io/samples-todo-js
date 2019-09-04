@@ -14,6 +14,15 @@ router.get('/:listId', function (req, res) {
     .then(view => res.render('list', view))
 });
 
+router.post('/commands/create-list', function (req, res) {
+  var listId = req.body.listId;
+  var name = req.body.name;
+  return Promise.resolve(TodoList.createNew(listId, name))
+    .then(events => client.saveListEvents(listId, events))
+    .then(response => res.sendStatus(200))
+    .catch(error => res.sendStatus(400))
+});
+
 router.post('/commands/create-todo', function (req, res) {
   var listId = req.body.listId;
   var todoText = req.body.text;
@@ -22,7 +31,7 @@ router.post('/commands/create-todo', function (req, res) {
     .then(todoList => todoList.addTodo(todoId, todoText))
     .then(events => client.saveListEvents(listId, events))
     .then(response => res.sendStatus(200))
-    .catch(error => res.sendStatus(400))
+    .catch(error => res.status(400).json({error: error}))
 });
 
 router.post('/commands/complete-todo', function (req, res) {
@@ -30,15 +39,6 @@ router.post('/commands/complete-todo', function (req, res) {
   var todoId = req.body.todoId;
   return client.loadTodoList(listId)
     .then(todoList => todoList.completeTodo(todoId))
-    .then(events => client.saveListEvents(listId, events))
-    .then(response => res.sendStatus(200))
-    .catch(error => res.sendStatus(400))
-});
-
-router.post('/commands/create-list', function (req, res) {
-  var listId = req.body.listId;
-  var name = req.body.name;
-  return Promise.resolve(TodoList.createNew(listId, name))
     .then(events => client.saveListEvents(listId, events))
     .then(response => res.sendStatus(200))
     .catch(error => res.sendStatus(400))

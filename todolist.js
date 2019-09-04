@@ -23,6 +23,13 @@ class TodoList {
     return [newEvent('TodoListCreatedEvent', data)]
   }
 
+  addTodo(todoId, text) {
+    if (this.completed) throw "List cannot be changed since it has been completed";
+    if (text === undefined || text.length < 5) throw "Text must have length > 4";
+    var todo = {todoId: todoId, text: text};
+    return [newEvent('TodoAddedEvent', todo)]
+  }
+
   completeTodo(todoId) {
     if (this.todosLeft.indexOf(todoId) > -1) {
       var todo = {todoId: todoId};
@@ -35,13 +42,6 @@ class TodoList {
       // Don't emit event if already completed
       return []
     }
-  }
-
-  addTodo(todoId, text) {
-    if (this.completed) throw "List cannot be changed since it has been completed";
-    if (text === undefined || text.length < 5) throw "Text must have length > 4";
-    var todo = {todoId: todoId, text: text};
-    return [newEvent('TodoAddedEvent', todo)]
   }
 
   'TodoListCreatedEvent'(event) {
