@@ -23,7 +23,9 @@
           <label id="label-{{todoId}}" for="{{todoId}}">{{text}}</label> {{/if}}
         </div>
       {{else}}
+      <span id="empty-list">
         <p>No todos, yet.</p>
+      </span>
       {{/each}}
     </div>
 
@@ -83,6 +85,7 @@
       var todoLabel = '<label id="label-' + todoId + '" for="' + todoId + '">&nbsp;' + todoText + '</label>';
       var todoDiv = '<div>' + todoInput + todoLabel + '</div>';
       $("#todos").append(todoDiv);
+      $('#empty-list').html('');
     }).fail(function (response) {
       console.log(response.responseJSON.error);
       $('#error-message').text('Error:' + response.responseJSON.error);
