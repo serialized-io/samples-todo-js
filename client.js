@@ -55,9 +55,8 @@ class TodoListClient {
   }
 
   saveListEvents(aggregateId, events) {
-    var request = {aggregateId: aggregateId, events: events};
     if (events.length > 0) {
-      return this.axios.post('/aggregates/list/events', request)
+      return this.axios.post('/aggregates/list/' + aggregateId + '/events', {events: events})
         .then(response => response.status)
         .catch(error => {
           throw `Failed to save events for list ${listId}`
