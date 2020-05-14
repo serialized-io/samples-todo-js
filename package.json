@@ -9,17 +9,17 @@
   "dependencies": {
     "@serialized/serialized-client": "^0.9.4",
     "body-parser": "~1.19.0",
-    "cookie-parser": "~1.4.4",
+    "cookie-parser": "^1.4.5",
     "debug": "~4.1.1",
-    "express": "~4.17.0",
-    "hbs": "^4.1.0",
-    "morgan": "1.9.1",
+    "express": "^4.17.1",
+    "hbs": "^4.1.1",
+    "morgan": "^1.10.0",
     "serve-favicon": "2.5.0",
-    "uuid": "3.3.2"
+    "uuid": "^8.0.0"
   },
   "devDependencies": {
     "axios": "^0.19.2",
-    "axios-mock-adapter": "1.16.0",
-    "mocha": "6.1.4"
+    "axios-mock-adapter": "^1.18.1",
+    "mocha": "^7.1.2"
   }
 }
