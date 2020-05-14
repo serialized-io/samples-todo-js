@@ -16,9 +16,7 @@ router.get('/', async function (req, res) {
 
 router.get('/stats', async function (req, res) {
   try {
-    let newVar = await client.findListStats();
-    console.log('n', newVar);
-    const stats = newVar.data;
+    let stats = (await client.findListStats()).data;
     res.send(stats);
   } catch (error) {
     res.status(400).json({error: error})
