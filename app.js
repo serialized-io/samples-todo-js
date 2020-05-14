@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
 var lists = require('./routes/lists');
-
+var TodoListClient = require('./client');
 var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
@@ -28,6 +28,13 @@ if (!process.env.SERIALIZED_ACCESS_KEY) {
 if (!process.env.SERIALIZED_SECRET_ACCESS_KEY) {
   throw "Environment variable SERIALIZED_SECRET_ACCESS_KEY is not set"
 }
+
+var client = TodoListClient.defaultClient();
+
+
+client.updateProjections()
+    .then(() => console.log('Done updating projections'))
+    .catch(e => console.error(e));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

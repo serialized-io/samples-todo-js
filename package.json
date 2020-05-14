@@ -7,7 +7,7 @@
     "test": "node ./node_modules/mocha/bin/mocha"
   },
   "dependencies": {
-    "axios": "^0.18.1",
+    "@serialized/serialized-client": "^0.9.4",
     "body-parser": "~1.19.0",
     "cookie-parser": "~1.4.4",
     "debug": "~4.1.1",
@@ -18,6 +18,7 @@
     "uuid": "3.3.2"
   },
   "devDependencies": {
+    "axios": "^0.19.2",
     "axios-mock-adapter": "1.16.0",
     "mocha": "6.1.4"
   }

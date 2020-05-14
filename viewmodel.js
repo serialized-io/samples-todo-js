@@ -7,19 +7,19 @@ class TodoListView {
     this.completed = completed;
   }
 
-  static fromProjection(projection) {
+  static fromProjection(todoListProjection) {
     var todos = [];
-    if (projection.todos) {
-      todos = projection.todos.map(todo => {
+    if (todoListProjection.todos) {
+      todos = todoListProjection.todos.map(todo => {
         if (todo.status === "COMPLETED") {
           todo.checked = "checked"
         }
         return todo;
       })
     }
-    var completed = projection.status === "COMPLETED";
-    var title = projection.status === "COMPLETED" ? `${projection.name} (completed)` : `${projection.name}`;
-    return new TodoListView(projection.listId, title, todos, completed)
+    var completed = todoListProjection.status === "COMPLETED";
+    var title = todoListProjection.status === "COMPLETED" ? `${todoListProjection.name} (completed)` : `${todoListProjection.name}`;
+    return new TodoListView(todoListProjection.listId, title, todos, completed)
   }
 
 }

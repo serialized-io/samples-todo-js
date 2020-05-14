@@ -1,80 +1,100 @@
-var uuidv4 = require('uuid/v4');
+var {AggregateRoot} = require("@serialized/serialized-client")
 
-function newEvent(eventType, data) {
-  return {
-    eventId: uuidv4(),
-    eventType: eventType,
-    data: data
+class TodoListCreated {
+  constructor(todoListId, name) {
+    this.eventType = 'TodoListCreated';
+    this.data = {
+      todoListId,
+      name
+    }
   }
 }
 
-class TodoList {
+class TodoListCompleted {
+  constructor(todoListId) {
+    this.eventType = 'TodoListCompleted';
+    this.data = {
+      todoListId,
+    }
+  }
+}
 
-  constructor() {
+class TodoAdded {
+  constructor(todoListId, todoId, text) {
+    this.eventType = 'TodoAdded';
+    this.data = {
+      todoListId, todoId, text,
+    };
+  }
+}
+
+class TodoCompleted {
+  constructor(todoListId, todoId, text) {
+    this.eventType = 'TodoCompleted';
+    this.data = {
+      todoListId: todoListId,
+      todoId: todoId,
+      text: text,
+    };
+  }
+}
+
+class TodoList extends AggregateRoot {
+
+  constructor(todoListId) {
+    super(todoListId, 'list')
+    if (!todoListId || todoListId.length !== 36) throw "Invalid listId";
+    this.todoListId = todoListId;
     this.todos = [];
     this.todosLeft = [];
     this.completed = false
   }
 
-  static createNew(listId, name) {
-    if (!listId || listId.length !== 36) throw "Invalid listId";
+  createList(name) {
     if (!name || name.length < 5) throw "Name must have length >= 5";
-    var data = {listId: listId, name: name};
-    return [newEvent('TodoListCreatedEvent', data)]
+    this.saveEvents([new TodoListCreated(this.todoListId, name)])
   }
 
   addTodo(todoId, text) {
     if (this.completed) throw "List cannot be changed since it has been completed";
     if (text === undefined || text.length < 5) throw "Text must have length > 4";
     var todo = {todoId: todoId, text: text};
-    return [newEvent('TodoAddedEvent', todo)]
+    this.saveEvents([new TodoAdded(this.aggregateId, todoId, text)]);
   }
 
   completeTodo(todoId) {
     if (this.todosLeft.indexOf(todoId) > -1) {
-      var todo = {todoId: todoId};
-      var events = [newEvent('TodoCompletedEvent', todo)];
+      var events = [new TodoCompleted(this.aggregateId, todoId)];
       if (this.todosLeft.length === 1) {
-        events.push(newEvent('TodoListCompletedEvent'))
+        events.push(new TodoListCompleted(this.todoListId))
       }
-      return events
+      this.saveEvents(events);
     } else {
       // Don't emit event if already completed
       return []
     }
   }
 
-  'TodoListCreatedEvent'(event) {
+  handleTodoListCreated(event) {
+    this.todoListId = event.data.todoListId;
     this.name = event.data.name
   }
 
-  'TodoAddedEvent'(event) {
+  handleTodoAdded(event) {
     this.todos.unshift({text: event.data.text, todoId: event.data.todoId});
     this.todosLeft.unshift(event.data.todoId)
   }
 
-  'TodoListCompletedEvent'(event) {
+  handleTodoListCompleted(event) {
     this.completed = true
   }
 
-  'TodoCompletedEvent'(event) {
+  handleTodoCompleted(event) {
     // Remove from list
     this.todosLeft = this.todosLeft.filter(function (todoId) {
       return todoId !== event.data.todoId;
     })
   }
-
-  handleEvent(event) {
-    this[event.eventType](event)
-  }
-
-  static loadStateFrom(events) {
-    var instance = new this.prototype.constructor();
-    for (var i = 0, len = events.length; i < len; i++) {
-      instance.handleEvent(events[i]);
-    }
-    return instance
-  }
 }
 
-module.exports = TodoList;
+module.exports = {TodoList, TodoAdded, TodoListCreated, TodoCompleted, TodoListCompleted};

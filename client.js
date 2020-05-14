@@ -1,68 +1,124 @@
-var axios = require('axios');
-var TodoList = require('./todolist');
+var {Serialized} = require("@serialized/serialized-client")
+var {TodoList} = require('./todolist');
 
 class TodoListClient {
 
-  constructor(axios) {
-    this.axios = axios
+  constructor(serializedClient) {
+    this.serializedClient = serializedClient
   }
 
   static defaultClient() {
     // Setup client to use access key headers from environment variables
-    var client = axios.create({
-      baseURL: 'https://api.serialized.io',
-      headers: {
-        'Serialized-Access-Key': `${process.env.SERIALIZED_ACCESS_KEY}`,
-        'Serialized-Secret-Access-Key': `${process.env.SERIALIZED_SECRET_ACCESS_KEY}`
-      }
+    const serializedInstance = Serialized.create({
+      accessKey: process.env.SERIALIZED_ACCESS_KEY,
+      secretAccessKey: process.env.SERIALIZED_SECRET_ACCESS_KEY
     });
-    return new TodoListClient(client)
+
+    serializedInstance.axiosClient.interceptors.request.use(r => {
+
+      console.log(r.url);
+
+      return r;
+    })
+
+    return new TodoListClient(serializedInstance)
   }
 
-  loadTodoList(listId) {
-    return this.axios.get(`/aggregates/list/${listId}`)
-      .then(response => TodoList.loadStateFrom(response.data.events))
-      .catch(error => {
-          throw `Failed to load todo list with id ${listId}`
-        }
-      )
+  async updateProjections() {
+    await this.createStatsProjection();
+    await this.createListsProjection();
   }
 
-  findListProjections() {
-    return this.axios.get('/projections/single/lists/')
-      .then(response => {
-        return response.data.projections.map(projection => projection.data)
+  async createStatsProjection() {
+    try {
+      await this.serializedClient.projections.createOrUpdateDefinition({
+        projectionName: 'list-stats',
+        feedName: 'list',
+        aggregated: true,
+        handlers: [
+          {
+            eventType: "TodoListCreated",
+            functions: [{function: "inc", targetSelector: "$.projection.listCount"}]
+          },
+          {
+            eventType: "TodoAdded",
+            functions: [{function: "inc", targetSelector: "$.projection.todoCount",}]
+          },
+        ]
       })
-      .catch(error => {
-        throw `Failed to load list projections`
-      })
-  }
-
-  findListStats() {
-    return this.axios.get('/projections/aggregated/list-stats')
-      .then(response => response.data.data)
-      .catch(error => {
-        throw `Failed to load list stats for list ${listId}: ${error.status}`
-      })
-  }
-
-  findListProjection(listId) {
-    return this.axios.get(`/projections/single/lists/${listId}`)
-      .then(response => response.data.data)
-      .catch(error => {
-        throw `Failed to load list projection for list ${listId}`
-      })
-  }
-
-  saveListEvents(aggregateId, events) {
-    if (events.length > 0) {
-      return this.axios.post('/aggregates/list/' + aggregateId + '/events', {events: events})
-        .then(response => response.status)
-        .catch(error => {
-          throw `Failed to save events for list ${listId}`
-        })
+    } catch (e) {
+      console.log('Error response: ', e.response.data);
     }
   }
+
+  async createListsProjection() {
+    try {
+      await this.serializedClient.projections.createOrUpdateDefinition({
+        projectionName: 'lists',
+        feedName: 'list',
+        handlers: [
+          {
+            eventType: "TodoListCreated",
+            functions: [
+              {function: "set", eventSelector: "$.event.name", targetSelector: "$.projection.name"},
+              {function: "set", eventSelector: "$.metadata.aggregateId", targetSelector: "$.projection.listId"}
+            ]
+          },
+          {
+            eventType: "TodoAdded",
+            functions: [{function: "push", targetSelector: "$.projection.todos"}]
+          },
+          {
+            eventType: "TodoCompleted",
+            functions: [{
+              function: "set",
+              targetSelector: "$.projection.todos[?].status",
+              targetFilter: "[?(@.todoId == $.event.todoId)]",
+              rawData: "COMPLETED"
+            }]
+          },
+          {
+            eventType: "TodoListCompleted",
+            functions: [{
+              function: "set",
+              targetSelector: "$.projection.status",
+              rawData: "COMPLETED"
+            }]
+          },
+        ]
+      })
+    } catch (e) {
+      console.log('Error response: ', e.response.data);
+    }
+
+  }
+
+  async createTodoList(todoList) {
+    await this.serializedClient.aggregates.create(todoList);
+  }
+
+  async saveTodoList(todoList) {
+    await this.serializedClient.aggregates.save(todoList, true);
+  }
+
+  async loadTodoList(listId) {
+    let todoList = new TodoList(listId);
+    await this.serializedClient.aggregates.load(todoList)
+    return todoList;
+  }
+
+  async findListProjections() {
+    return (await this.serializedClient.projections.listSingleProjections('lists')).projections;
+  }
+
+  async findListStats() {
+    return await this.serializedClient.projections.getAggregatedProjection('list-stats')
+  }
+
+  async findListProjection(listId) {
+    return await this.serializedClient.projections.getSingleProjection('lists', listId)
+  }
+
 }
 
 module.exports = TodoListClient;

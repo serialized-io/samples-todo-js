@@ -4,15 +4,25 @@ var TodoListClient = require('../client');
 var client = TodoListClient.defaultClient();
 var TodoListView = require('../viewmodel');
 
-router.get('/', function (req, res) {
-  return client.findListProjections()
-    .then(lists => lists.map(list => TodoListView.fromProjection(list)))
-    .then(views => res.render('index', { lists: views }))
+router.get('/', async function (req, res) {
+  try {
+    const lists = await client.findListProjections();
+    const views = lists.map(list => TodoListView.fromProjection(list.data));
+    res.render('index', {lists: views});
+  } catch (error) {
+    res.status(400).json({error: error})
+  }
 });
 
-router.get('/stats', function (req, res) {
-  return client.findListStats()
-    .then(listStats => res.send(listStats))
+router.get('/stats', async function (req, res) {
+  try {
+    let newVar = await client.findListStats();
+    console.log('n', newVar);
+    const stats = newVar.data;
+    res.send(stats);
+  } catch (error) {
+    res.status(400).json({error: error})
+  }
 });
 
 module.exports = router;

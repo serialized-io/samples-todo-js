@@ -1,47 +1,56 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+const TodoListClient = require('../client');
+const client = TodoListClient.defaultClient();
+const {TodoList} = require('../todolist');
+const TodoListView = require('../viewmodel');
 
-var TodoListClient = require('../client');
-var client = TodoListClient.defaultClient();
-
-var TodoList = require('../todolist');
-var TodoListView = require('../viewmodel');
-
-router.get('/:listId', function (req, res) {
-  var listId = req.params.listId;
-  return client.findListProjection(listId)
-    .then(list => TodoListView.fromProjection(list))
-    .then(view => res.render('list', view))
+router.get('/:listId', async function (req, res) {
+  const listId = req.params.listId;
+  try {
+    let view = TodoListView.fromProjection((await client.findListProjection(listId)).data);
+    res.render('list', view);
+  } catch (error) {
+    res.status(400).json({error: error})
+  }
 });
 
-router.post('/commands/create-list', function (req, res) {
-  var listId = req.body.listId;
-  var name = req.body.name;
-  return Promise.resolve(TodoList.createNew(listId, name))
-    .then(events => client.saveListEvents(listId, events))
-    .then(response => res.sendStatus(200))
-    .catch(error => res.sendStatus(400))
+router.post('/commands/create-list', async function (req, res) {
+  const {listId, name} = req.body
+  const todoList = new TodoList(listId);
+  todoList.createList(name);
+  try {
+    await client.createTodoList(todoList);
+    res.sendStatus(200);
+  } catch (e) {
+    res.status(400).json({error: error})
+  }
 });
 
-router.post('/commands/create-todo', function (req, res) {
-  var listId = req.body.listId;
-  var todoText = req.body.text;
-  var todoId = req.body.todoId;
-  return client.loadTodoList(listId)
-    .then(todoList => todoList.addTodo(todoId, todoText))
-    .then(events => client.saveListEvents(listId, events))
-    .then(response => res.sendStatus(200))
-    .catch(error => res.status(400).json({error: error}))
+router.post('/commands/create-todo', async function (req, res) {
+  const {listId, text, todoId} = req.body;
+  const todoList = await client.loadTodoList(listId);
+  todoList.addTodo(todoId, text);
+  try {
+    await client.saveTodoList(todoList);
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(400).json({error: error})
+  }
 });
 
-router.post('/commands/complete-todo', function (req, res) {
-  var listId = req.body.listId;
-  var todoId = req.body.todoId;
-  return client.loadTodoList(listId)
-    .then(todoList => todoList.completeTodo(todoId))
-    .then(events => client.saveListEvents(listId, events))
-    .then(response => res.sendStatus(200))
-    .catch(error => res.sendStatus(400))
+router.post('/commands/complete-todo', async function (req, res) {
+  let listId = req.body.listId;
+  let todoText = req.body.text;
+  let todoId = req.body.todoId;
+  let todoList = await client.loadTodoList(listId);
+  todoList.completeTodo(todoId, todoText);
+  try {
+    await client.saveTodoList(todoList);
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(400).json({error: error})
+  }
 });
 
 module.exports = router;
