@@ -15,9 +15,7 @@ class TodoListClient {
     });
 
     serializedInstance.axiosClient.interceptors.request.use(r => {
-
       console.log(r.url);
-
       return r;
     })
 
@@ -31,7 +29,7 @@ class TodoListClient {
 
   async createStatsProjection() {
     try {
-      await this.serializedClient.projections.createOrUpdateDefinition({
+      const request = {
         projectionName: 'list-stats',
         feedName: 'list',
         aggregated: true,
@@ -45,7 +43,8 @@ class TodoListClient {
             functions: [{function: "inc", targetSelector: "$.projection.todoCount",}]
           },
         ]
-      })
+      };
+      await this.serializedClient.projections.createOrUpdateDefinition(request)
     } catch (e) {
       console.log('Error response: ', e.response.data);
     }
@@ -108,15 +107,15 @@ class TodoListClient {
   }
 
   async findListProjections() {
-    return (await this.serializedClient.projections.listSingleProjections('lists')).projections;
+    return (await this.serializedClient.projections.listSingleProjections({projectionName: 'lists'})).projections;
   }
 
   async findListStats() {
-    return await this.serializedClient.projections.getAggregatedProjection('list-stats')
+    return await this.serializedClient.projections.getAggregatedProjection({projectionName: 'list-stats'})
   }
 
   async findListProjection(listId) {
-    return await this.serializedClient.projections.getSingleProjection('lists', listId)
+    return await this.serializedClient.projections.getSingleProjection({projectionName: 'lists', projectionId: listId})
   }
 
 }
