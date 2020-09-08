@@ -1,12 +1,6 @@
-var {TodoAdded, TodoCompleted, TodoList, TodoListCompleted, TodoListCreated} = require("../todolist");
-
-var uuidv4 = require('uuid/v4');
-var assert = require('assert');
-
-var MockAdapter = require('axios-mock-adapter');
-var axios = require('axios');
-var mock = new MockAdapter(axios);
-var {Serialized} = require("@serialized/serialized-client")
+const {TodoAdded, TodoCompleted, TodoList, TodoListCompleted, TodoListCreated} = require("../todolist");
+const uuidv4 = require('uuid').v4;
+const assert = require('assert');
 
 describe('TodoList', function () {
 

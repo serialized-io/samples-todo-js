@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "node ./node_modules/mocha/bin/mocha"
+    "test": "jest"
   },
   "dependencies": {
-    "@serialized/serialized-client": "^0.9.4",
+    "@serialized/serialized-client": "^2.1.0",
     "body-parser": "~1.19.0",
     "cookie-parser": "^1.4.5",
     "debug": "~4.1.1",
@@ -18,8 +18,6 @@
     "uuid": "^8.0.0"
   },
   "devDependencies": {
-    "axios": "^0.19.2",
-    "axios-mock-adapter": "^1.18.1",
-    "mocha": "^7.1.2"
+    "jest": "^26.4.1"
   }
 }
