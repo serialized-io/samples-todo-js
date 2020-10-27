@@ -7,7 +7,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@serialized/serialized-client": "^2.1.0",
+    "@serialized/serialized-client": "^2.2.0",
     "body-parser": "~1.19.0",
     "cookie-parser": "^1.4.5",
     "debug": "~4.1.1",
